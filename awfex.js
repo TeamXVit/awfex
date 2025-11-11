@@ -4,7 +4,7 @@ import mul from "./functions/mul.js";
 import div from "./functions/div.js";
 import print from "./functions/print.js";
 
-const FUNCTIONS = {
+export const FUNCTIONS = {
   add: add,
   sub: sub,
   mul: mul,
@@ -12,7 +12,7 @@ const FUNCTIONS = {
   print: print
 };
 
-export default function engine(node) {
+export function engine(node) {
   if (typeof node === "number" || typeof node === "string") {
     return node;
   }
@@ -31,17 +31,17 @@ export default function engine(node) {
   throw new Error(`Invalid node type: ${typeof node}`);
 }
 
-const workflow = {
-  print: [
-    {
-      sub: [
-        {
-          add: [2, 3]
-        },
-        4
-      ]
-    }
-  ]
-};
+// const workflow = {
+//   print: [
+//     {
+//       sub: [
+//         {
+//           add: [2, 3]
+//         },
+//         4
+//       ]
+//     }
+//   ]
+// };
 
-engine(workflow);
+// engine(workflow);
