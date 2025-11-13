@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AWFEX Workflow Tester</title>
+
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -51,6 +52,9 @@
       white-space: pre-wrap;
       word-wrap: break-word;
     }
+    input {
+      font-size: 14px;
+    }
     .docs {
       margin-top: 40px;
       width: 600px;
@@ -78,15 +82,17 @@
     }
   </style>
 </head>
+
 <body>
   <h1>AWFEX - Workflow Engine Tester</h1>
 
+  <!-- Workflow JSON Input -->
   <textarea id="jsonInput">{
   "print": [
     {
       "sub": [
         {
-          "add": [2, 3]
+          "add": ["$query:x", 3]
         },
         4
       ]
@@ -94,11 +100,23 @@
   ]
 }</textarea>
 
+  <!-- Query Params Input -->
+  <div style="margin-top:20px; width:600px;">
+    <label><b>Query Params</b> (optional):</label>
+    <input
+      id="queryInput"
+      value="x=3"
+      style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; margin-top:6px;"
+    />
+  </div>
+
+  <!-- Run Button -->
   <button onclick="runWorkflow()">Run Workflow</button>
 
+  <!-- Output -->
   <pre id="output">Result will appear here...</pre>
 
-  <!-- Endpoints Documentation -->
+  <!-- API Documentation -->
   <div class="docs">
     <h2>API Endpoints</h2>
 
@@ -127,42 +145,95 @@
     <div class="endpoint">
       <span class="method">GET</span>
       <code>/run/:name</code>
-      <div>Runs a workflow from the database by name.</div>
+      <div>
+        Runs a workflow stored in the database.  
+        <b>Supports query parameters.</b>
+      </div>
+      <pre>GET /run/mathFlow?x=10&y=20</pre>
+
+      <b>Example Workflow Using Query Params:</b>
+      <pre>{
+  "mul": ["$query:x", "$query:y"]
+}</pre>
+
+      <b>Example Output:</b>
+      <pre>200</pre>
     </div>
 
     <div class="endpoint">
       <span class="method">POST</span>
       <code>/run</code>
-      <div>Runs a workflow sent directly in the POST body.</div>
-      <pre>{
-  "add": [2, 3]
+      <div>
+        Runs a workflow sent directly in the POST body.  
+        <b>Also supports query parameters.</b>
+      </div>
+      <pre>POST /run?x=5
+{
+  "add": ["$query:x", 3]
 }</pre>
+
+      <b>Output:</b>
+      <pre>8</pre>
     </div>
 
     <div class="endpoint">
       <span class="method">GET</span>
       <code>/functions</code>
-      <div>Returns a list of available function names.</div>
+      <div>Returns a list of available functions.</div>
+    </div>
+
+    <hr style="margin:20px 0;">
+
+    <!-- NEW DOCUMENTATION FOR QUERY PARAM HANDLING -->
+    <h2>Using Query Parameters in Workflows</h2>
+
+    <div class="endpoint">
+      <div>
+        You can pass query parameters into any workflow (saved or inline)  
+        using the special syntax:
+      </div>
+
+      <pre>"$query:key"</pre>
+
+      <b>Example:</b>
+      <pre>{
+  "add": ["$query:a", "$query:b"]
+}</pre>
+
+      <b>Request:</b>
+      <pre>/run? a=7 & b=5</pre>
+
+      <b>Result:</b>
+      <pre>12</pre>
     </div>
   </div>
 
+  <!-- JavaScript -->
   <script>
     async function runWorkflow() {
       const input = document.getElementById("jsonInput").value;
       const output = document.getElementById("output");
+      const query = document.getElementById("queryInput").value.trim();
+
+      const url = query ? `/run?${query}` : `/run`;
+
       output.textContent = "Running...";
+
       try {
-        const res = await fetch("/run", {
+        const res = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: input
         });
+
         const data = await res.json();
         output.textContent = JSON.stringify(data, null, 2);
+
       } catch (err) {
         output.textContent = "Error: " + err.message;
       }
     }
   </script>
+
 </body>
 </html>

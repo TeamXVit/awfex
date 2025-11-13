@@ -12,12 +12,24 @@ export const FUNCTIONS = {
   print: print
 };
 
-export function engine(node) {
-  if (typeof node === "number" || typeof node === "string") {
-    return node;
+function convertIfNumeric(str) {
+  const num = Number(str);
+  if (!isNaN(num) && String(num) === str) {
+    return num;
+  } else {
+    return str;
+  }
+}
+
+export function engine(node, ctx) {
+  if (typeof node === "number" || typeof node === "string") { 
+    if(typeof node === "string" && node.startsWith("$query:")){ 
+      return convertIfNumeric(ctx[node.split(":")[1]]); 
+    } 
+    return node; 
   }
   if (Array.isArray(node)) {
-    return node.map(engine);
+    return node.map(n => engine(n, ctx));
   }
   if (typeof node === "object" && node !== null) {
     const funcName = Object.keys(node)[0];
@@ -25,23 +37,26 @@ export function engine(node) {
     if (!FUNCTIONS[funcName]) {
       throw new Error(`Unknown function: ${funcName}`);
     }
-    const resolvedArgs = args.map(engine);
+    const resolvedArgs = args.map(a => engine(a, ctx));
     return FUNCTIONS[funcName](...resolvedArgs);
   }
   throw new Error(`Invalid node type: ${typeof node}`);
 }
 
-// const workflow = {
-//   print: [
-//     {
-//       sub: [
-//         {
-//           add: [2, 3]
-//         },
-//         4
-//       ]
-//     }
-//   ]
-// };
+if (import.meta.main) {
+  const workflow = {
+    print: [
+      {
+        sub: [
+          {
+            add: [2, 3]
+          },
+          4
+        ]
+      }
+    ]
+  };
+  engine(workflow, {});
+}
 
-// engine(workflow);
+

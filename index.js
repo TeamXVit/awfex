@@ -103,7 +103,7 @@ app.get("/run/:name", async (req, res) => {
     }
 
     const workflowJSON = JSON.parse(wf.workflow);
-    const result = engine(workflowJSON);
+    const result = engine(workflowJSON, req.query);
 
     res.json({ success: true, result });
   } catch (err) {
@@ -113,7 +113,7 @@ app.get("/run/:name", async (req, res) => {
 
 app.post("/run", (req, res) => {
   try {
-    const result = engine(req.body);
+    const result = engine(req.body, req.query);
     res.json({ success: true, result });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
