@@ -51,6 +51,31 @@
       white-space: pre-wrap;
       word-wrap: break-word;
     }
+    .docs {
+      margin-top: 40px;
+      width: 600px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+    .docs h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    .endpoint {
+      margin-bottom: 15px;
+    }
+    .endpoint code {
+      background: #f3f4f6;
+      padding: 3px 6px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .method {
+      font-weight: bold;
+      color: #2563eb;
+    }
   </style>
 </head>
 <body>
@@ -72,6 +97,54 @@
   <button onclick="runWorkflow()">Run Workflow</button>
 
   <pre id="output">Result will appear here...</pre>
+
+  <!-- Endpoints Documentation -->
+  <div class="docs">
+    <h2>API Endpoints</h2>
+
+    <div class="endpoint">
+      <span class="method">POST</span>
+      <code>/workflow</code>
+      <div>Saves or updates a workflow.</div>
+      <pre>{
+  "name": "mathFlow",
+  "workflow": { "mul": [{ "add": [2, 3] }, 4] }
+}</pre>
+    </div>
+
+    <div class="endpoint">
+      <span class="method">GET</span>
+      <code>/workflow/:name</code>
+      <div>Retrieve workflow JSON by name.</div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method">GET</span>
+      <code>/workflow</code>
+      <div>List all workflow names.</div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method">GET</span>
+      <code>/run/:name</code>
+      <div>Runs a workflow from the database by name.</div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method">POST</span>
+      <code>/run</code>
+      <div>Runs a workflow sent directly in the POST body.</div>
+      <pre>{
+  "add": [2, 3]
+}</pre>
+    </div>
+
+    <div class="endpoint">
+      <span class="method">GET</span>
+      <code>/functions</code>
+      <div>Returns a list of available function names.</div>
+    </div>
+  </div>
 
   <script>
     async function runWorkflow() {
