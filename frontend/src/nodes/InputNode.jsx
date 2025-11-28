@@ -181,26 +181,26 @@ export default function InputNode({ id, data }) {
               marginBottom: "8px",
               border: "1px solid #e2e8f0",
               fontFamily: "monospace",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
+              whiteSpace: "pre-wrap",
+              maxHeight: "120px",
+              overflowY: "auto",
             }}
           >
             {String(data.value)}
           </div>
         )}
 
-        {/* Input field */}
+        {/* Textarea field */}
         <div style={{ display: "flex", gap: "6px", alignItems: "stretch" }}>
-          <input
+          <textarea
             aria-label={`input-value-${id}`}
-            type="text"
             value={data.value ?? ""}
             onChange={handleChange}
             placeholder="Type here..."
             style={{
               flex: 1,
-              padding: "8px 10px",
+              minHeight: "80px",
+              padding: "10px",
               borderRadius: "6px",
               border: "1.5px solid #e2e8f0",
               outline: "none",
@@ -210,6 +210,10 @@ export default function InputNode({ id, data }) {
               transition:
                 "border-color 200ms ease, background 200ms ease, box-shadow 200ms ease",
               color: "#1e293b",
+              resize: "both",
+              overflow: "auto",
+              whiteSpace: "pre-wrap",
+              fontFamily: "monospace",
             }}
             onFocus={(e) => {
               e.currentTarget.style.borderColor = "#3b82f6";
@@ -242,6 +246,7 @@ export default function InputNode({ id, data }) {
               transition:
                 "background 200ms ease, color 200ms ease, border-color 200ms ease",
               fontWeight: "700",
+              alignSelf: "flex-start",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = "#3b82f6";
