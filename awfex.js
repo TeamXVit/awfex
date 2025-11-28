@@ -6,13 +6,15 @@ import { sub, subDescription } from "./functions/sub.js";
 import { mul, mulDescription } from "./functions/mul.js";
 import { div, divDescription } from "./functions/div.js";
 import { print, printDescription } from "./functions/print.js";
+import { gemini, geminiDescription } from "./functions/gemini.js";
 
 export const FUNCTIONS = {
   add: add,
   sub: sub,
   mul: mul,
   div: div,
-  print: print
+  print: print,
+  gemini: gemini
 };
 
 export const DESCRIPTIONS = {
@@ -20,8 +22,9 @@ export const DESCRIPTIONS = {
   sub: subDescription,
   mul: mulDescription,
   div: divDescription,
-  print: printDescription
-}
+  print: printDescription,
+  gemini: geminiDescription
+};
 
 function convertIfNumeric(str) {
   const num = Number(str);
@@ -45,12 +48,16 @@ function resolveSpecial(value, ctx) {
   return value;
 }
 
-export function engine(node, ctx) {
-  if (typeof node === "number" || typeof node === "string") { 
-    return resolveSpecial(node, ctx); 
+export async function engine(node, ctx) {
+  if (typeof node === "number" || typeof node === "string") {
+    return resolveSpecial(node, ctx);
   }
   if (Array.isArray(node)) {
-    return node.map(n => engine(n, ctx));
+    const results = [];
+    for (const n of node) {
+      results.push(await engine(n, ctx));
+    }
+    return results;
   }
   if (typeof node === "object" && node !== null) {
     const funcName = Object.keys(node)[0];
@@ -58,8 +65,11 @@ export function engine(node, ctx) {
     if (!FUNCTIONS[funcName]) {
       throw new Error(`Unknown function: ${funcName}`);
     }
-    const resolvedArgs = args.map(a => engine(a, ctx));
-    return FUNCTIONS[funcName](...resolvedArgs);
+    const resolvedArgs = [];
+    for (const a of args) {
+      resolvedArgs.push(await engine(a, ctx));
+    }
+    return await FUNCTIONS[funcName](...resolvedArgs);
   }
   throw new Error(`Invalid node type: ${typeof node}`);
 }
@@ -77,5 +87,5 @@ if (import.meta.main) {
       }
     ]
   };
-  engine(workflow, {});
+  await engine(workflow, {});
 }

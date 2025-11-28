@@ -118,23 +118,20 @@ app.get("/workflow", async (req, res) => {
 app.get("/run/:name", async (req, res) => {
   try {
     const wf = await Workflows.findOne({ where: { name: req.params.name } });
-
     if (!wf) {
       return res.status(404).json({ success: false, error: "Workflow not found" });
     }
-
     const workflowJSON = JSON.parse(wf.workflow);
-    const result = engine(workflowJSON, req.query);
-
+    const result = await engine(workflowJSON, req.query);
     res.json({ success: true, result });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-app.post("/run", (req, res) => {
+app.post("/run", async (req, res) => {
   try {
-    const result = engine(req.body, req.query);
+    const result = await engine(req.body, req.query);
     res.json({ success: true, result });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
