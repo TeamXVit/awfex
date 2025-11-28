@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import { FUNCTIONS, engine } from "./awfex.js";
+import { FUNCTIONS, DESCRIPTIONS, engine } from "./awfex.js";
 import { Sequelize, Model, DataTypes } from "sequelize";
 
 const app = express();
@@ -13,6 +13,7 @@ app.use(express.static("public"));
 const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: "./database.sqlite",
+  logging: false
 });
 
 class Workflows extends Model {}
@@ -30,6 +31,14 @@ await sequelize.sync({ force: false });
 app.get("/functions", (req, res) => {
   try {
     res.json(Object.keys(FUNCTIONS));
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+app.get("/descriptions", (req, res) => {
+  try {
+    res.json(DESCRIPTIONS);
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }

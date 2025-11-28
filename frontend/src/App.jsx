@@ -15,13 +15,19 @@ export default function App() {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [functions, setFunctions] = useState([]);
+  const [descriptions, setDescriptions] = useState({});
   const [selectedFunc, setSelectedFunc] = useState("");
   const [workflows, setWorkflows] = useState([]);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:5000/functions")
       .then((r) => r.json())
       .then(setFunctions)
+      .catch(console.error);
+    fetch("http://localhost:5000/descriptions")
+      .then((r) => r.json())
+      .then(setDescriptions)
       .catch(console.error);
   }, []);
 
@@ -34,18 +40,18 @@ export default function App() {
       const response = await fetch("http://localhost:5000/workflow");
       if (!response.ok) throw new Error("Failed to fetch workflows");
       const data = await response.json();
-      
+
       if (!data.success || !Array.isArray(data.workflows)) {
         setWorkflows([]);
         return;
       }
-      
+
       const workflowPromises = data.workflows.map(async (name) => {
         try {
           const workflowResponse = await fetch(`http://localhost:5000/workflow/${name}`);
           if (!workflowResponse.ok) throw new Error(`Failed to fetch ${name}`);
           const workflowData = await workflowResponse.json();
-          
+
           return {
             id: name,
             name: name,
@@ -58,10 +64,10 @@ export default function App() {
           return null;
         }
       });
-      
+
       const workflowResults = await Promise.all(workflowPromises);
       const validWorkflows = workflowResults.filter(w => w !== null);
-      
+
       setWorkflows(validWorkflows);
     } catch (error) {
       console.error("Failed to fetch workflows:", error);
@@ -113,7 +119,7 @@ export default function App() {
         id,
         type: "custom",
         position: { x: Math.random() * 600, y: Math.random() * 400 },
-        data: { label: selectedFunc, onDelete: deleteNode },
+        data: { label: selectedFunc, onDelete: deleteNode, tooltip: descriptions[selectedFunc] },
       },
     ]);
   };
@@ -149,8 +155,9 @@ export default function App() {
       if (node.type === "inputNode") {
         const raw = node.data?.value ?? "";
         if (raw === "") return "";
-        const n = Number(raw);
-        return !Number.isNaN(n) && String(n) === raw.trim() ? n : raw;
+        const rawStr = String(raw).trim();
+        const num = Number(rawStr);
+        return !Number.isNaN(num) && String(num) === rawStr ? num : raw;
       }
 
       const args = findSources(id).map((s) => resolveNode(s, new Set(visited)));
@@ -177,7 +184,7 @@ export default function App() {
       return;
     }
 
-    fetch("http://localhost:5000/run", {
+    fetch("http://localhost:5000/run"+query, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(workflowJSON),
@@ -195,6 +202,105 @@ export default function App() {
       })
       .catch((err) => alert(`Error: ${err.message}`));
   };
+  
+  const rebuildFromWorkflow = (workflow) => {
+    let newNodes = [];
+    let newEdges = [];
+    let idCounter = 1;
+    let edgeCounter = 1;
+
+    const genNodeId = (prefix) => `${prefix}-${idCounter++}`;
+    const genEdgeId = (source, target) => `e-${source}-${target}-${edgeCounter++}`;
+
+    // ---- STEP 1: Compute subtree width (number of leaves) ----
+    const computeWidth = (data) => {
+      if (typeof data !== "object" || data === null || Array.isArray(data)) {
+        return 1; // leaf (input node)
+      }
+
+      const fnName = Object.keys(data)[0];
+      const args = data[fnName];
+      return args.reduce((sum, arg) => sum + computeWidth(arg), 0);
+    };
+
+    // ---- STEP 2: Build nodes using computed widths ----
+    const build = (data, depth = 0, xOffset = 0) => {
+      let nodeId;
+
+      // INPUT NODE
+      if (typeof data !== "object" || data === null || Array.isArray(data)) {
+        nodeId = genNodeId("input");
+
+        newNodes.push({
+          id: nodeId,
+          type: "inputNode",
+          position: { x: depth * 220, y: xOffset * 120 },
+          data: {
+            value: data,
+            onDelete: deleteNode,
+            onValueChange: handleInputValueChange,
+          },
+        });
+
+        return { nodeId, width: 1 };
+      }
+
+      // FUNCTION NODE
+      const fnName = Object.keys(data)[0];
+      const args = data[fnName];
+
+      const totalWidth = args.reduce((sum, arg) => sum + computeWidth(arg), 0);
+
+      nodeId = genNodeId(fnName);
+
+      newNodes.push({
+        id: nodeId,
+        type: "custom",
+        position: { x: depth * 220, y: xOffset * 120 },
+        data: {
+          label: fnName,
+          tooltip: descriptions[fnName],
+          onDelete: deleteNode,
+        },
+      });
+
+      // Child positions
+      let childYOffset = xOffset - totalWidth / 2;
+
+      args.forEach((arg) => {
+        const w = computeWidth(arg);
+        const childCenter = childYOffset + w / 2;
+
+        const child = build(arg, depth + 1, childCenter);
+
+        newEdges.push({
+          id: genEdgeId(child.nodeId, nodeId),
+          source: child.nodeId,
+          target: nodeId,
+        });
+
+        childYOffset += w;
+      });
+
+      return { nodeId, width: totalWidth };
+    };
+
+    // ---- STEP 3: Handle multi-root workflows ----
+    if (Array.isArray(workflow)) {
+      let yBase = 0;
+      workflow.forEach((wf) => {
+        const w = computeWidth(wf);
+        build(wf, 0, yBase + w / 2);
+        yBase += w + 1;
+      });
+    } else {
+      const w = computeWidth(workflow);
+      build(workflow, 0, w / 2);
+    }
+
+    return { newNodes, newEdges };
+  };
+
 
   const handleSaveWorkflow = async (name, queryParams) => {
     if (!workflowJSON) {
@@ -223,7 +329,7 @@ export default function App() {
       }
 
       const data = await response.json();
-      
+
       if (data.success) {
         alert(`Workflow "${name}" saved successfully!`);
         await fetchWorkflows();
@@ -239,32 +345,25 @@ export default function App() {
   const handleSelectWorkflow = async (workflowId) => {
     try {
       const workflow = workflows.find((w) => w.id === workflowId);
-      if (!workflow) {
-        console.error("Workflow not found:", workflowId);
-        return;
-      }
+      if (!workflow) return;
 
       const response = await fetch(`http://localhost:5000/workflow/${workflow.name}`);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to load workflow");
-      }
-      
       const data = await response.json();
-      
-      if (data.success) {
-        console.log("Loading workflow:", data.workflow);
-        alert(`Loading workflow: ${data.name}\n(Node reconstruction not yet implemented)`);
-      } else {
-        throw new Error(data.error || "Load failed");
-      }
-      
+
+      if (!data.success) throw new Error(data.error || "Failed to load workflow");
+
+      const { newNodes, newEdges } = rebuildFromWorkflow(data.workflow);
+
+      setNodes(newNodes);
+      setEdges(newEdges);
+
+      alert(`Workflow "${workflow.name}" loaded successfully!`);
     } catch (error) {
-      console.error("Failed to load workflow:", error);
       alert(`Error loading workflow: ${error.message}`);
+      console.error(error);
     }
   };
+
 
   const handleDeleteWorkflow = async (workflowId) => {
     const workflow = workflows.find((w) => w.id === workflowId);
@@ -283,7 +382,7 @@ export default function App() {
       }
 
       const data = await response.json();
-      
+
       if (data.success) {
         alert(`Workflow "${workflow.name}" deleted successfully`);
         await fetchWorkflows();
@@ -301,10 +400,10 @@ export default function App() {
     : "// Connect nodes to generate JSON";
 
   return (
-    <div 
-      style={{ 
-        width: "100vw", 
-        height: "100vh", 
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
         display: "flex",
         margin: 0,
         padding: 0,
@@ -316,6 +415,8 @@ export default function App() {
         onCopy={copyToClipboard}
         onRun={runWorkflow}
         workflows={workflows}
+        query={query}
+        setQuery={setQuery}
         onSelectWorkflow={handleSelectWorkflow}
         onDeleteWorkflow={handleDeleteWorkflow}
       />

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function LeftPanel({ prettyJSON, onCopy, onRun, workflows, onSelectWorkflow, onDeleteWorkflow }) {
+export default function LeftPanel({ prettyJSON, onCopy, onRun, workflows, onSelectWorkflow, onDeleteWorkflow, query, setQuery }) {
   const [activeTab, setActiveTab] = useState("workflows");
 
   return (
@@ -84,6 +84,8 @@ export default function LeftPanel({ prettyJSON, onCopy, onRun, workflows, onSele
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         {activeTab === "workflows" ? (
           <WorkflowsTab
+            query={query}
+            setQuery={setQuery}
             workflows={workflows}
             onSelectWorkflow={onSelectWorkflow}
             onDeleteWorkflow={onDeleteWorkflow}
@@ -97,7 +99,179 @@ export default function LeftPanel({ prettyJSON, onCopy, onRun, workflows, onSele
   );
 }
 
-function WorkflowsTab({ workflows, onSelectWorkflow, onDeleteWorkflow, onRun }) {
+function QueryBuilder({ query, setQuery }) {
+
+  const parseQuery = () => {
+    if (!query) return [];
+    try {
+      const params = new URLSearchParams(
+        query.startsWith("?") ? query : "?" + query
+      );
+      return Array.from(params.entries()).map(([key, value]) => ({
+        key,
+        value,
+      }));
+    } catch {
+      return [];
+    }
+  };
+
+  const [params, setParams] = useState(parseQuery());
+
+  const updateQuery = (list) => {
+    const qs = new URLSearchParams();
+    list.forEach((p) => {
+      if (p.key.trim() !== "") qs.set(p.key.trim(), p.value);
+    });
+    setQuery("?" + qs.toString());
+  };
+
+  const handleChange = (index, field, value) => {
+    const updated = [...params];
+    updated[index][field] = value;
+    setParams(updated);
+    updateQuery(updated);
+  };
+
+  const addParam = () => {
+    const updated = [...params, { key: "", value: "" }];
+    setParams(updated);
+  };
+
+  const removeParam = (i) => {
+    const updated = params.filter((_, idx) => idx !== i);
+    setParams(updated);
+    updateQuery(updated);
+  };
+
+  return (
+    <div
+      style={{
+        marginTop: "16px",
+        padding: "12px",
+        background: "#0a0f1e",
+        borderRadius: "8px",
+        border: "1px solid #1e293b",
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+      }}
+    >
+      <div
+        style={{
+          fontSize: "13px",
+          fontWeight: "700",
+          color: "#e2e8f0",
+          marginBottom: "4px",
+        }}
+      >
+        Query Parameters
+      </div>
+
+      {params.map((p, i) => (
+        <div
+          key={i}
+          style={{
+            display: "flex",
+            gap: "8px",
+            background: "#0f172a",
+            padding: "8px",
+            borderRadius: "6px",
+            border: "1px solid #1e293b",
+            alignItems: "center",
+          }}
+        >
+          <input
+            placeholder="key"
+            value={p.key}
+            onChange={(e) => handleChange(i, "key", e.target.value)}
+            style={{
+              flex: 1,
+              minWidth: 0,
+              padding: "8px 10px",
+              background: "#0a0f1e",
+              color: "#e2e8f0",
+              border: "1px solid #1e293b",
+              borderRadius: "6px",
+              fontSize: "12px",
+              outline: "none",
+            }}
+            onFocus={(e) => (e.target.style.borderColor = "#3b82f6")}
+            onBlur={(e) => (e.target.style.borderColor = "#1e293b")}
+          />
+
+          <input
+            placeholder="value"
+            value={p.value}
+            onChange={(e) => handleChange(i, "value", e.target.value)}
+            style={{
+              flex: 1,
+              padding: "8px 10px",
+              background: "#0a0f1e",
+              color: "#e2e8f0",
+              border: "1px solid #1e293b",
+              borderRadius: "6px",
+              fontSize: "12px",
+              outline: "none",
+            }}
+            onFocus={(e) => (e.target.style.borderColor = "#3b82f6")}
+            onBlur={(e) => (e.target.style.borderColor = "#1e293b")}
+          />
+
+          <button
+            onClick={() => removeParam(i)}
+            style={{
+              background: "#ef4444",
+              border: "none",
+              width: "32px",
+              height: "32px",
+              borderRadius: "6px",
+              color: "white",
+              cursor: "pointer",
+              fontSize: "16px",
+              fontWeight: "700",
+              display: "grid",
+              placeItems: "center",
+              transition: "opacity 200ms ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.85")}
+          >
+            ×
+          </button>
+        </div>
+      ))}
+
+      <button
+        onClick={addParam}
+        style={{
+          padding: "10px 12px",
+          background: "#1e3a8a",
+          color: "white",
+          borderRadius: "6px",
+          border: "1px solid #1d4ed8",
+          fontSize: "13px",
+          fontWeight: "700",
+          cursor: "pointer",
+          textAlign: "center",
+          transition: "all 200ms ease",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "#1d4ed8";
+          e.currentTarget.style.boxShadow = "0 2px 6px rgba(30, 58, 138, 0.4)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "#1e3a8a";
+          e.currentTarget.style.boxShadow = "none";
+        }}
+      >
+        + Add Parameter
+      </button>
+    </div>
+  );
+}
+
+function WorkflowsTab({ workflows, onSelectWorkflow, onDeleteWorkflow, onRun, query, setQuery }) {
   return (
     <div
       className="scrollable"
@@ -157,6 +331,8 @@ function WorkflowsTab({ workflows, onSelectWorkflow, onDeleteWorkflow, onRun }) 
         <span>▶️</span>
         Run Current Workflow
       </button>
+
+      <QueryBuilder query={query} setQuery={setQuery} />
 
       {workflows.length === 0 ? (
         <div

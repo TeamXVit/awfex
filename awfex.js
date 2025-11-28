@@ -1,11 +1,11 @@
 import { config } from "dotenv";
 config();
 
-import add from "./functions/add.js";
-import sub from "./functions/sub.js";
-import mul from "./functions/mul.js";
-import div from "./functions/div.js";
-import print from "./functions/print.js";
+import { add, addDescription } from "./functions/add.js";
+import { sub, subDescription } from "./functions/sub.js";
+import { mul, mulDescription } from "./functions/mul.js";
+import { div, divDescription } from "./functions/div.js";
+import { print, printDescription } from "./functions/print.js";
 
 export const FUNCTIONS = {
   add: add,
@@ -14,6 +14,14 @@ export const FUNCTIONS = {
   div: div,
   print: print
 };
+
+export const DESCRIPTIONS = {
+  add: addDescription,
+  sub: subDescription,
+  mul: mulDescription,
+  div: divDescription,
+  print: printDescription
+}
 
 function convertIfNumeric(str) {
   const num = Number(str);
@@ -71,5 +79,3 @@ if (import.meta.main) {
   };
   engine(workflow, {});
 }
-
-
