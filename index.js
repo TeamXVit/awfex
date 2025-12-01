@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import { FUNCTIONS, DESCRIPTIONS, engine } from "./awfex.js";
 import { Sequelize, Model, DataTypes } from "sequelize";
+import auth from "./middleware/auth.js";
 
 const app = express();
 app.use(bodyParser.json());
@@ -16,7 +17,7 @@ const sequelize = new Sequelize({
   logging: false
 });
 
-class Workflows extends Model {}
+class Workflows extends Model { }
 
 Workflows.init(
   {
@@ -28,6 +29,7 @@ Workflows.init(
 
 await sequelize.sync({ force: false });
 
+// sends functions names
 app.get("/functions", (req, res) => {
   try {
     res.json(Object.keys(FUNCTIONS));
@@ -36,6 +38,7 @@ app.get("/functions", (req, res) => {
   }
 });
 
+// sends functions descriptions
 app.get("/descriptions", (req, res) => {
   try {
     res.json(DESCRIPTIONS);
@@ -44,6 +47,7 @@ app.get("/descriptions", (req, res) => {
   }
 });
 
+// creates a new workflow
 app.post("/workflow", async (req, res) => {
   try {
     const { name, workflow } = req.body;
@@ -70,7 +74,8 @@ app.post("/workflow", async (req, res) => {
   }
 });
 
-app.get("/workflow/:name", async (req, res) => {
+// gets a workflow by name
+app.get("/workflow/:name", auth, async (req, res) => {
   try {
     const wf = await Workflows.findOne({ where: { name: req.params.name } });
 
@@ -88,7 +93,8 @@ app.get("/workflow/:name", async (req, res) => {
   }
 });
 
-app.delete("/workflow/:name", async (req, res) => {
+// deletes a workflow by name
+app.delete("/workflow/:name", auth, async (req, res) => {
   try {
     const deleted = await Workflows.destroy({ where: { name: req.params.name } });
     if (deleted === 0) {
@@ -100,7 +106,8 @@ app.delete("/workflow/:name", async (req, res) => {
   }
 });
 
-app.get("/workflow", async (req, res) => {
+// gets all workflows
+app.get("/workflow", auth, async (req, res) => {
   try {
     const workflows = await Workflows.findAll({
       attributes: ["name"],
@@ -115,7 +122,8 @@ app.get("/workflow", async (req, res) => {
   }
 });
 
-app.get("/run/:name", async (req, res) => {
+// runs a workflow by name
+app.get("/run/:name", auth, async (req, res) => {
   try {
     const wf = await Workflows.findOne({ where: { name: req.params.name } });
     if (!wf) {
@@ -129,7 +137,8 @@ app.get("/run/:name", async (req, res) => {
   }
 });
 
-app.post("/run", async (req, res) => {
+// runs a workflow
+app.post("/run", auth, async (req, res) => {
   try {
     const result = await engine(req.body, req.query);
     res.json({ success: true, result });

@@ -24,6 +24,15 @@ export default function LeftPanel({ prettyJSON, onCopy, onRun, workflows, onSele
         >
           JSON
         </button>
+        <button
+          onClick={() => setActiveTab("settings")}
+          className={`flex-1 py-3.5 px-4 text-sm font-bold tracking-wide transition-all border-b-2 ${activeTab === "settings"
+            ? "bg-slate-900 text-indigo-400 border-indigo-500"
+            : "bg-transparent text-slate-400 border-transparent hover:text-slate-300"
+            }`}
+        >
+          Settings
+        </button>
       </div>
 
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -36,8 +45,10 @@ export default function LeftPanel({ prettyJSON, onCopy, onRun, workflows, onSele
             onDeleteWorkflow={onDeleteWorkflow}
             onRun={onRun}
           />
-        ) : (
+        ) : activeTab === "json" ? (
           <JSONTab prettyJSON={prettyJSON} onCopy={onCopy} />
+        ) : (
+          <SettingsTab />
         )}
       </div>
     </div>
@@ -45,7 +56,6 @@ export default function LeftPanel({ prettyJSON, onCopy, onRun, workflows, onSele
 }
 
 function QueryBuilder({ query, setQuery }) {
-
   const parseQuery = () => {
     if (!query) return [];
     try {
@@ -162,6 +172,8 @@ function WorkflowsTab({ workflows, onSelectWorkflow, onDeleteWorkflow, onRun, qu
             No workflows saved yet.
             <br />
             Create nodes and save your workflow.
+            <br />
+            Save your API key in settings to fetch or run workflows.
           </div>
         </div>
       ) : (
@@ -223,6 +235,39 @@ function JSONTab({ prettyJSON, onCopy }) {
 
       <div className="text-[11px] text-slate-400 bg-slate-800 p-2.5 rounded-md border border-slate-700">
         💡 <strong>Tip:</strong> Connect nodes to generate executable JSON
+      </div>
+    </div>
+  );
+}
+
+function SettingsTab() {
+  const [apiKey, setApiKey] = useState(() => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; apiKey=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return "";
+  });
+
+  const handleSave = (val) => {
+    setApiKey(val);
+    document.cookie = `apiKey=${val}; path=/; max-age=31536000`; // 1 year
+  };
+
+  return (
+    <div className="p-4 flex flex-col gap-4">
+      <h3 className="text-sm font-bold text-slate-200 m-0">Settings</h3>
+      <div className="flex flex-col gap-2">
+        <label className="text-xs text-slate-400 font-semibold">API Key</label>
+        <input
+          type="password"
+          value={apiKey}
+          onChange={(e) => handleSave(e.target.value)}
+          placeholder="Enter API Key"
+          className="w-full py-2.5 px-3 bg-slate-800 text-slate-200 border border-slate-700 rounded-md text-sm outline-none focus:border-indigo-500 transition-colors"
+        />
+        <p className="text-[10px] text-slate-500">
+          Key is stored locally in your browser cookies.
+        </p>
       </div>
     </div>
   );
