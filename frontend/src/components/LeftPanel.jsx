@@ -163,52 +163,56 @@ function WorkflowsTab({ workflows, onSelectWorkflow, onDeleteWorkflow, onRun, qu
       </button>
 
       <QueryBuilder query={query} setQuery={setQuery} />
-
-      {workflows.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center gap-3 text-slate-500 py-10">
-          <div className="text-4xl opacity-50">📋</div>
-          <div className="text-xs text-center leading-relaxed">
-            No workflows saved yet.
-            <br />
-            Create nodes and save your workflow.
-            <br />
-            Save your API key in settings to fetch or run workflows.
-          </div>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2 mt-2">
-          {workflows.map((workflow) => (
-            <div
-              key={workflow.id}
-              className="bg-slate-800 border border-slate-700 rounded-md p-2.5 cursor-pointer transition-all hover:bg-slate-700 hover:border-slate-600 group"
-              onClick={() => onSelectWorkflow(workflow.id)}
-            >
-              <div className="flex justify-between items-start gap-2">
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-slate-200 mb-1 overflow-hidden text-ellipsis whitespace-nowrap group-hover:text-white">
-                    {workflow.name}
-                  </div>
-                  <div className="text-[11px] text-slate-400 flex gap-2">
-                    <span>{workflow.nodeCount} nodes</span>
-                    <span>•</span>
-                    <span>{workflow.date}</span>
-                  </div>
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDeleteWorkflow(workflow.id);
-                  }}
-                  className="bg-transparent border-none text-red-500/70 hover:text-red-400 hover:bg-red-500/10 cursor-pointer text-base p-0.5 px-1.5 rounded transition-all"
-                  title="Delete workflow"
-                >
-                  ×
-                </button>
-              </div>
+      <div className="flex flex-col flex-1">
+        {workflows.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center gap-3 text-slate-500 py-10">
+            <div className="text-4xl opacity-50">📋</div>
+            <div className="text-xs text-center leading-relaxed">
+              No workflows saved yet.
+              <br />
+              Create nodes and save your workflow.
+              <br />
+              Save your API key in settings to fetch or run workflows.
             </div>
-          ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2 mt-2">
+            {workflows.map((workflow) => (
+              <div
+                key={workflow.id}
+                className="bg-slate-800 border border-slate-700 rounded-md p-2.5 cursor-pointer transition-all hover:bg-slate-700 hover:border-slate-600 group"
+                onClick={() => onSelectWorkflow(workflow.id)}
+              >
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold text-slate-200 mb-1 overflow-hidden text-ellipsis whitespace-nowrap group-hover:text-white">
+                      {workflow.name}
+                    </div>
+                    <div className="text-[11px] text-slate-400 flex gap-2">
+                      <span>{workflow.nodeCount} nodes</span>
+                      <span>•</span>
+                      <span>{workflow.date}</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteWorkflow(workflow.id);
+                    }}
+                    className="bg-transparent border-none text-red-500/70 hover:text-red-400 hover:bg-red-500/10 cursor-pointer text-base p-0.5 px-1.5 rounded transition-all"
+                    title="Delete workflow"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="text-[11px] text-slate-400 bg-slate-800 p-2.5 rounded-md border border-slate-700 mt-auto">
+          <strong>Tip:</strong> Give inputs to the functions in the mentioned parameters order.
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -233,7 +237,7 @@ function JSONTab({ prettyJSON, onCopy }) {
       </pre>
 
       <div className="text-[11px] text-slate-400 bg-slate-800 p-2.5 rounded-md border border-slate-700">
-        💡 <strong>Tip:</strong> Connect nodes to generate executable JSON
+        <strong>Tip:</strong> Connect nodes to generate executable JSON
       </div>
     </div>
   );
