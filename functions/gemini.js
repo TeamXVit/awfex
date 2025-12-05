@@ -1,14 +1,21 @@
 import { GoogleGenAI } from "@google/genai";
 
+const geminiCache = new Map();
+
 export async function gemini(apiKey, modelName, input) {
+  const cacheKey = JSON.stringify({ apiKey, modelName, input });
+  if (geminiCache.has(cacheKey)) {
+    return geminiCache.get(cacheKey);
+  }
   const ai = new GoogleGenAI({ apiKey });
   const response = await ai.models.generateContent({
     model: modelName,
     contents: input,
   });
-  return response.text;
+  const text = response.text;
+  geminiCache.set(cacheKey, text);
+  return text;
 }
-
 export const geminiDescription = `
 gemini(apiKey, modelName, input):
 - Calls a Google Gemini model and returns its generated text output.

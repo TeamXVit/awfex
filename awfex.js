@@ -12,6 +12,7 @@ import { jsonParse, jsonParseDescription } from "./functions/jsonParse.js";
 import { jsonStringify, jsonStringifyDescription } from "./functions/jsonStringify.js";
 import { httpRequest, httpRequestDescription } from "./functions/httpRequest.js";
 import { sqlite, sqliteDescription } from "./functions/sqlite.js";
+import { regex, regexDescription } from "./functions/regex.js";
 
 export const FUNCTIONS = {
   add: add,
@@ -24,7 +25,8 @@ export const FUNCTIONS = {
   jsonParse: jsonParse,
   jsonStringify: jsonStringify,
   httpRequest: httpRequest,
-  sqlite: sqlite
+  sqlite: sqlite,
+  regex: regex
 };
 
 export const DESCRIPTIONS = {
@@ -38,7 +40,8 @@ export const DESCRIPTIONS = {
   jsonParse: jsonParseDescription,
   jsonStringify: jsonStringifyDescription,
   httpRequest: httpRequestDescription,
-  sqlite: sqliteDescription
+  sqlite: sqliteDescription,
+  regex: regexDescription
 };
 
 function convertIfNumeric(str) {
