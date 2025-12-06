@@ -128,86 +128,6 @@ export default function Setup() {
                         </div>
                     </StepCard>
                 </div>
-
-                {/* Core Concepts */}
-                <div className="mt-24 pt-16 border-t border-slate-800">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-white mb-4">Core Concepts</h2>
-                        <p className="text-slate-400 max-w-2xl mx-auto">Understanding how AWFEX translates your visual design into execution.</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-
-                        {/* The Canvas & Nodes */}
-                        <div className="p-6 rounded-xl bg-slate-900/40 border border-slate-800/60 transition-all hover:bg-slate-900/60">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="p-2 bg-indigo-900/40 rounded-lg text-indigo-400">
-                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>
-                                </div>
-                                <h3 className="text-xl font-bold text-white">The Canvas & Nodes</h3>
-                            </div>
-                            <p className="text-slate-400 leading-relaxed mb-4">
-                                The canvas is your workspace. Each <strong>Node</strong> represents a distinct function that accepts inputs and produces an output.
-                            </p>
-                            <ul className="space-y-2 text-sm text-slate-400">
-                                <li className="flex gap-2">
-                                    <span className="text-indigo-500">•</span>
-                                    <span><strong>Connectors:</strong> Draw lines between nodes to pipe the output of one function into the input of another.</span>
-                                </li>
-                                <li className="flex gap-2">
-                                    <span className="text-indigo-500">•</span>
-                                    <span><strong>Tooltips:</strong> Hover over any function in the sidebar to read exactly what arguments it expects.</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        {/* JSON & Execution */}
-                        <div className="p-6 rounded-xl bg-slate-900/40 border border-slate-800/60 transition-all hover:bg-slate-900/60">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="p-2 bg-purple-900/40 rounded-lg text-purple-400">
-                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
-                                </div>
-                                <h3 className="text-xl font-bold text-white">JSON Generation</h3>
-                            </div>
-                            <p className="text-slate-400 leading-relaxed mb-4">
-                                Your visual design is compiled into a recursive JSON structure. This lightweight JSON tells the engine exactly which functions to run and in what order.
-                            </p>
-                            <div className="bg-slate-950 p-3 rounded font-mono text-xs text-slate-500 overflow-x-auto border border-slate-800">
-                                <span className="text-purple-400">{"{"}</span><br />
-                                &nbsp;&nbsp;<span className="text-blue-400">"functionName"</span>: <span className="text-yellow-400">["arg1", "arg2"]</span><br />
-                                <span className="text-purple-400">{"}"}</span>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                {/* Advanced Features Section */}
-                <div className="mt-16 pt-16 border-t border-slate-800">
-                    <h2 className="text-2xl font-bold text-white mb-8">Special Variables</h2>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <FeatureBox
-                            title="$env Variables"
-                            icon={<svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>}
-                            content={
-                                <span>
-                                    Access server-side secrets safely. Use <code className="bg-slate-800 px-1 py-0.5 rounded text-emerald-300 text-xs">$env:KEY_NAME</code> in any input field to inject Environment Variables at runtime.
-                                </span>
-                            }
-                        />
-                        <FeatureBox
-                            title="$query Params"
-                            icon={<svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
-                            content={
-                                <span>
-                                    Make workflows dynamic. Pass URL params (e.g., <code className="bg-slate-800 px-1 py-0.5 rounded text-blue-300 text-xs">?userId=123</code>) and access them via <code className="bg-slate-800 px-1 py-0.5 rounded text-blue-300 text-xs">$query:userId</code>.
-                                </span>
-                            }
-                        />
-                    </div>
-                </div>
-
             </div>
         </div>
     );
@@ -237,18 +157,3 @@ function StepCard({ number, title, description, children, isLast }) {
     );
 }
 
-function FeatureBox({ title, icon, content }) {
-    return (
-        <div className="p-6 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors">
-            <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-slate-800 rounded-lg">
-                    {icon}
-                </div>
-                <h3 className="text-xl font-bold text-white">{title}</h3>
-            </div>
-            <p className="text-slate-400 leading-relaxed text-sm">
-                {content}
-            </p>
-        </div>
-    );
-}
