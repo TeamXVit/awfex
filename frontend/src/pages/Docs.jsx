@@ -164,18 +164,12 @@ export default function Docs() {
                             x-api-key: YOUR_API_KEY
                         </pre>
 
-                        <p className="text-sm text-slate-400 mt-3">Rate Limits:</p>
-                        <ul className="text-sm text-slate-400 list-disc ml-5 mt-1">
-                            <li>100 requests per 15 minutes per IP</li>
-                            <li>Exceeded limit returns <code className="text-red-400">429 Too Many Requests</code></li>
-                        </ul>
-
                         <div className="mt-4 pt-4 border-t border-slate-700">
                             <p className="text-sm text-slate-400 mb-2">Current Base URL:</p>
                             <div className="bg-slate-950 p-3 rounded border border-slate-800">
                                 <code className="text-sm font-mono text-blue-400">{baseUrl || "http://localhost:5000"}</code>
                             </div>
-                            <p className="text-xs text-slate-500 mt-2">Configure this in Settings</p>
+                            <p className="text-xs text-slate-500 mt-2">Configure this in Designer Settings</p>
                         </div>
                     </div>
 

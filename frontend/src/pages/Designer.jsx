@@ -61,7 +61,14 @@ export default function Designer() {
         alert("Copied to clipboard!");
     };
 
+    const [isJsonValid, setIsJsonValid] = useState(true);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
     const handleRunWorkflow = async () => {
+        if (!isJsonValid) {
+            alert("Cannot run workflow: Invalid JSON in the editor.");
+            return;
+        }
         if (!workflowJSON) {
             alert("No workflow to run. Please create nodes and connect them.");
             return;
@@ -119,7 +126,11 @@ export default function Designer() {
         }
     };
 
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const handleJsonUpdate = (newJson) => {
+        // Allow passing object directly or string
+        const parsed = typeof newJson === "string" ? JSON.parse(newJson) : newJson;
+        loadWorkflow(parsed);
+    };
 
     return (
         <div className="w-screen h-screen flex m-0 p-0 overflow-hidden bg-slate-950 text-slate-200">
@@ -128,6 +139,8 @@ export default function Designer() {
                 toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                 prettyJSON={prettyJSON}
                 onCopy={copyToClipboard}
+                onJsonUpdate={handleJsonUpdate}
+                onJsonValidityChange={setIsJsonValid}
                 workflows={workflows}
                 query={query}
                 setQuery={setQuery}
@@ -147,6 +160,7 @@ export default function Designer() {
                     onSaveWorkflow={handleSaveWorkflow}
                     onRunWorkflow={handleRunWorkflow}
                     isRunning={isRunning}
+                    isRunDisabled={!isJsonValid}
                 />
 
                 <FlowCanvas

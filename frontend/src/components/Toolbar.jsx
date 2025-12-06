@@ -12,6 +12,7 @@ export default function Toolbar({
   onSaveWorkflow,
   onRunWorkflow,
   isRunning = false,
+  isRunDisabled = false,
 }) {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [workflowName, setWorkflowName] = useState("");
@@ -104,8 +105,9 @@ export default function Toolbar({
         {/* Run Workflow Button */}
         <button
           onClick={onRunWorkflow}
-          disabled={isRunning}
-          className={`py-2 px-4 rounded-lg border text-sm font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-lg ${isRunning
+          disabled={isRunning || isRunDisabled}
+          title={isRunDisabled ? "Fix invalid JSON to run" : "Run Workflow"}
+          className={`py-2 px-4 rounded-lg border text-sm font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-lg ${isRunning || isRunDisabled
             ? "bg-slate-700 border-slate-600 text-slate-400 cursor-not-allowed"
             : "bg-indigo-600 border-indigo-500 text-white hover:bg-indigo-500 hover:border-indigo-400 shadow-indigo-500/20"
             }`}

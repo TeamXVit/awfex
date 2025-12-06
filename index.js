@@ -4,19 +4,10 @@ import cors from "cors";
 import { FUNCTIONS, DESCRIPTIONS, engine } from "./awfex.js";
 import { Sequelize, Model, DataTypes } from "sequelize";
 import auth from "./middleware/auth.js";
-import rateLimit from "express-rate-limit";
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: { success: false, error: "Too many requests from this IP, please try again after 15 minutes" },
-});
 
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
-app.use(express.static("public"));
-app.use(limiter);
 
 //  Sequelize Setup
 const sequelize = new Sequelize({

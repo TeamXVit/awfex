@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function LeftPanel({ isCollapsed, toggleSidebar, prettyJSON, onCopy, workflows, onSelectWorkflow, onDeleteWorkflow, query, setQuery }) {
+export default function LeftPanel({ isCollapsed, toggleSidebar, prettyJSON, onCopy, onJsonUpdate, onJsonValidityChange, workflows, onSelectWorkflow, onDeleteWorkflow, query, setQuery }) {
   const [activeTab, setActiveTab] = useState("workflows");
 
   return (
@@ -57,7 +57,7 @@ export default function LeftPanel({ isCollapsed, toggleSidebar, prettyJSON, onCo
               onDeleteWorkflow={onDeleteWorkflow}
             />
           ) : activeTab === "json" ? (
-            <JSONTab prettyJSON={prettyJSON} onCopy={onCopy} />
+            <JSONTab prettyJSON={prettyJSON} onCopy={onCopy} onJsonUpdate={onJsonUpdate} onJsonValidityChange={onJsonValidityChange} />
           ) : (
             <SettingsTab />
           )}
@@ -177,7 +177,7 @@ function WorkflowsTab({ workflows, onSelectWorkflow, onDeleteWorkflow, query, se
               <br />
               Create nodes and save your workflow.
               <br />
-              Save your API key in settings to fetch or run workflows.
+              Save your API key and API URL in settings to fetch or run workflows.
             </div>
           </div>
         ) : (
@@ -222,27 +222,60 @@ function WorkflowsTab({ workflows, onSelectWorkflow, onDeleteWorkflow, query, se
   );
 }
 
-function JSONTab({ prettyJSON, onCopy }) {
+function JSONTab({ prettyJSON, onCopy, onJsonUpdate, onJsonValidityChange }) {
+  const [value, setValue] = useState(prettyJSON);
+  const [error, setError] = useState(null);
+  const [isFocused, setIsFocused] = useState(false);
+
+  useEffect(() => {
+    if (!isFocused && !error) {
+      setValue(prettyJSON);
+      if (onJsonValidityChange) onJsonValidityChange(true); // Reset validity when synced
+    }
+  }, [prettyJSON, isFocused, error, onJsonValidityChange]);
+
+  const handleChange = (e) => {
+    const newVal = e.target.value;
+    setValue(newVal);
+    try {
+      const parsed = JSON.parse(newVal);
+      setError(null);
+      if (onJsonUpdate) onJsonUpdate(parsed);
+      if (onJsonValidityChange) onJsonValidityChange(true);
+    } catch (err) {
+      setError(err.message);
+      if (onJsonValidityChange) onJsonValidityChange(false);
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col p-3 gap-2">
       <div className="flex justify-between items-center">
         <h3 className="m-0 text-sm font-bold text-slate-200">
-          Generated JSON
+          Workflow JSON
         </h3>
-        <button
-          onClick={onCopy}
-          className="py-1.5 px-3 bg-slate-800 border border-slate-700 rounded-md text-indigo-400 text-xs font-semibold cursor-pointer transition-all hover:bg-slate-700 hover:text-indigo-300 hover:border-slate-600"
-        >
-          Copy
-        </button>
+        <div className="flex gap-2">
+          {error && <span className="text-[10px] text-red-400 font-mono py-1">Invalid JSON</span>}
+          <button
+            onClick={onCopy}
+            className="py-1.5 px-3 bg-slate-800 border border-slate-700 rounded-md text-indigo-400 text-xs font-semibold cursor-pointer transition-all hover:bg-slate-700 hover:text-indigo-300 hover:border-slate-600"
+          >
+            Copy
+          </button>
+        </div>
       </div>
 
-      <pre className="flex-1 overflow-auto bg-slate-950 rounded-md p-3 font-mono text-xs text-indigo-100 border border-slate-800 m-0 scrollable">
-        {prettyJSON}
-      </pre>
+      <textarea
+        value={value}
+        onChange={handleChange}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        className={`flex-1 overflow-auto bg-slate-950 rounded-md p-3 font-mono text-xs text-indigo-100 border ${error ? "border-red-500/50" : "border-slate-800"} m-0 scrollable resize-none outline-none focus:border-indigo-500 transition-colors`}
+        spellCheck={false}
+      />
 
       <div className="text-[11px] text-slate-400 bg-slate-800 p-2.5 rounded-md border border-slate-700">
-        <strong>Tip:</strong> Connect nodes to generate executable JSON
+        <strong>Tip:</strong> Edit JSON to update the graph. Connect nodes to generate executable JSON.
       </div>
     </div>
   );
