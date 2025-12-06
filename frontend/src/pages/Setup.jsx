@@ -76,6 +76,11 @@ export default function Setup() {
                                 <span className="text-slate-400">=</span>
                                 <span className="text-slate-500">AIzaSy... (Your Google Gemini Key)</span>
                             </div>
+                            <div className="flex gap-4 mb-2 border-b border-slate-800 pb-2">
+                                <span className="text-purple-400 font-bold min-w-[140px]">REDIS_URL</span>
+                                <span className="text-slate-400">=</span>
+                                <span className="text-slate-500">redis://default:password@host:port (Your Redis connection URL)</span>
+                            </div>
                             <div className="flex gap-4">
                                 <span className="text-purple-400 font-bold min-w-[140px]">API_KEY</span>
                                 <span className="text-slate-400">=</span>

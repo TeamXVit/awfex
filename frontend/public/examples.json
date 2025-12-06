@@ -1,0 +1,127 @@
+[
+    {
+        "title": "Natural Language Database Querying",
+        "description": "Turn plain English questions into executing database queries using a multi-step AI pipeline.",
+        "mechanics": [
+            {
+                "step": "1. Gemini",
+                "description": "Translates your natural language request (e.g., 'get users over 25') into a raw SQL query string."
+            },
+            {
+                "step": "2. Regex",
+                "description": "Extracts *only* the SQL code from Gemini's markdown response to ensure clean execution."
+            },
+            {
+                "step": "3. SQLite",
+                "description": "Takes the cleaned SQL string and executes it against the database, returning the actual results."
+            }
+        ],
+        "jsonCode": {
+            "sqlite": [
+                {
+                    "regex": [
+                        {
+                            "gemini": [
+                                "$env:GEMINI_API_KEY",
+                                "gemini-2.5-flash",
+                                {
+                                    "add": [
+                                        "your a sqlite agent, you only output dqlite query.",
+                                        "gel all the users from users table whose age is above 25."
+                                    ]
+                                }
+                            ]
+                        },
+                        "```sqlite\\s*([\\s\\S]*?)```"
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "title": "Automated Data Analysis",
+        "description": "Fetch raw data from your database and have an AI agent perform insightful analysis on it automatically.",
+        "mechanics": [
+            {
+                "step": "1. SQLite",
+                "description": "Fetches raw rows from the database (e.g., all users)."
+            },
+            {
+                "step": "2. JSON Stringify",
+                "description": "Converts the database array result into a string format that the AI can read."
+            },
+            {
+                "step": "3. Add",
+                "description": "Combines the data string with an analysis prompt (e.g., 'Analyze this data...')."
+            },
+            {
+                "step": "4. Gemini",
+                "description": "Receives the combined context and outputs a text summary or insight about the data."
+            }
+        ],
+        "jsonCode": {
+            "gemini": [
+                "$env:GEMINI_API_KEY",
+                "gemini-2.5-flash",
+                {
+                    "add": [
+                        {
+                            "jsonStringify": [
+                                {
+                                    "sqlite": [
+                                        "SELECT * FROM users;\n"
+                                    ]
+                                }
+                            ]
+                        },
+                        "your a data analysis agent, analysis the provided data."
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "title": "Todo Reminder Assistant",
+        "description": "Fetches your TODO item from an API and turns it into a natural reminder.",
+        "mechanics": [
+            {
+                "step": "1. httpRequest",
+                "description": "Fetches a TODO item from a REST API using the ID you provide."
+            },
+            {
+                "step": "2. jsonStringify",
+                "description": "Converts the HTTP response into a JSON string so Gemini can read it cleanly."
+            },
+            {
+                "step": "3. Gemini",
+                "description": "Takes the API response and turns it into a friendly reminder message."
+            }
+        ],
+        "jsonCode": {
+            "gemini": [
+                "$env:GEMINI_API_KEY",
+                "gemini-2.5-flash",
+                {
+                    "add": [
+                        {
+                            "jsonStringify": [
+                                {
+                                    "httpRequest": [
+                                        {
+                                            "add": [
+                                                "https://jsonplaceholder.typicode.com/todos/",
+                                                "$query:x"
+                                            ]
+                                        },
+                                        "GET"
+                                    ]
+                                }
+                            ]
+                        },
+                        "This is the response from my TODO API. Convert it into a reminder about what I need to do."
+                    ]
+                }
+            ]
+        }
+    }
+]
