@@ -11,7 +11,7 @@ import { wait, waitDescription } from "./functions/wait.js";
 import { jsonParse, jsonParseDescription } from "./functions/jsonParse.js";
 import { jsonStringify, jsonStringifyDescription } from "./functions/jsonStringify.js";
 import { httpRequest, httpRequestDescription } from "./functions/httpRequest.js";
-import { sqlite, sqliteDescription } from "./functions/sqlite.js";
+import { postgres, postgresDescription } from "./functions/postgres.js";
 import { regex, regexDescription } from "./functions/regex.js";
 import { redis, redisDescription } from "./functions/redis.js";
 
@@ -26,7 +26,7 @@ export const FUNCTIONS = {
   jsonParse: jsonParse,
   jsonStringify: jsonStringify,
   httpRequest: httpRequest,
-  sqlite: sqlite,
+  postgres: postgres,
   regex: regex,
   redis: redis
 };
@@ -42,7 +42,7 @@ export const DESCRIPTIONS = {
   jsonParse: jsonParseDescription,
   jsonStringify: jsonStringifyDescription,
   httpRequest: httpRequestDescription,
-  sqlite: sqliteDescription,
+  postgres: postgresDescription,
   regex: regexDescription,
   redis: redisDescription
 };

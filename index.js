@@ -9,26 +9,39 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-//  Sequelize Setup
-const sequelize = new Sequelize({
-  dialect: "sqlite",
-  storage: "./database.sqlite",
-  logging: false
+//  Sequelize Setup for Neon PostgreSQL
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: "postgres",
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false, // for Neon SSL
+    },
+  },
+  logging: false,
 });
 
+// Workflows Model
 class Workflows extends Model { }
 
 Workflows.init(
   {
-    name: DataTypes.STRING,
-    workflow: DataTypes.STRING,
+    name: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+    },
+    workflow: {
+      type: DataTypes.JSON,
+      allowNull: false,
+    },
   },
   { sequelize, modelName: "workflows" }
 );
 
-await sequelize.sync({ force: false });
+await sequelize.sync({ alter: true });
 
-// sends functions names
+// sends function names
 app.get("/functions", (req, res) => {
   try {
     res.json(Object.keys(FUNCTIONS));
@@ -46,25 +59,25 @@ app.get("/descriptions", (req, res) => {
   }
 });
 
-// creates a new workflow
+// creates or updates workflow
 app.post("/workflow", auth, async (req, res) => {
   try {
     const { name, workflow } = req.body;
 
     if (!name || !workflow) {
-      return res.status(400).json({ success: false, error: "Name and workflow required" });
+      return res.status(400).json({
+        success: false,
+        error: "Name and workflow required",
+      });
     }
 
     const existing = await Workflows.findOne({ where: { name } });
 
     if (existing) {
-      existing.workflow = JSON.stringify(workflow);
+      existing.workflow = workflow;
       await existing.save();
     } else {
-      await Workflows.create({
-        name,
-        workflow: JSON.stringify(workflow),
-      });
+      await Workflows.create({ name, workflow });
     }
 
     res.json({ success: true, message: "Workflow saved successfully" });
@@ -73,39 +86,47 @@ app.post("/workflow", auth, async (req, res) => {
   }
 });
 
-// gets a workflow by name
+// get workflow by name
 app.get("/workflow/:name", auth, async (req, res) => {
   try {
     const wf = await Workflows.findOne({ where: { name: req.params.name } });
 
     if (!wf) {
-      return res.status(404).json({ success: false, error: "Workflow not found" });
+      return res
+        .status(404)
+        .json({ success: false, error: "Workflow not found" });
     }
 
     res.json({
       success: true,
       name: wf.name,
-      workflow: JSON.parse(wf.workflow),
+      workflow: wf.workflow,
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// deletes a workflow by name
+// delete workflow
 app.delete("/workflow/:name", auth, async (req, res) => {
   try {
-    const deleted = await Workflows.destroy({ where: { name: req.params.name } });
+    const deleted = await Workflows.destroy({
+      where: { name: req.params.name },
+    });
+
     if (deleted === 0) {
-      return res.status(404).json({ success: false, error: "Workflow not found" });
+      return res
+        .status(404)
+        .json({ success: false, error: "Workflow not found" });
     }
+
     res.json({ success: true, message: "Workflow deleted successfully" });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// gets all workflows
+// get all workflows
 app.get("/workflow", auth, async (req, res) => {
   try {
     const workflows = await Workflows.findAll({
@@ -121,22 +142,26 @@ app.get("/workflow", auth, async (req, res) => {
   }
 });
 
-// runs a workflow by name
+// run workflow by name
 app.get("/run/:name", auth, async (req, res) => {
   try {
     const wf = await Workflows.findOne({ where: { name: req.params.name } });
+
     if (!wf) {
-      return res.status(404).json({ success: false, error: "Workflow not found" });
+      return res
+        .status(404)
+        .json({ success: false, error: "Workflow not found" });
     }
-    const workflowJSON = JSON.parse(wf.workflow);
-    const result = await engine(workflowJSON, req.query);
+
+    const result = await engine(wf.workflow, req.query);
+
     res.json({ success: true, result });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// runs a workflow
+// run workflow directly
 app.post("/run", auth, async (req, res) => {
   try {
     const result = await engine(req.body, req.query);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export default function LeftPanel({ isCollapsed, toggleSidebar, prettyJSON, onCopy, onJsonUpdate, onJsonValidityChange, workflows, onSelectWorkflow, onDeleteWorkflow, query, setQuery }) {
+export default function LeftPanel({ isCollapsed, toggleSidebar, prettyJSON, onCopy, onJsonUpdate, onJsonValidityChange, workflows, onSelectWorkflow, onDeleteWorkflow, query, setQuery, loading }) {
   const [activeTab, setActiveTab] = useState("workflows");
 
   return (
@@ -55,6 +55,7 @@ export default function LeftPanel({ isCollapsed, toggleSidebar, prettyJSON, onCo
               workflows={workflows}
               onSelectWorkflow={onSelectWorkflow}
               onDeleteWorkflow={onDeleteWorkflow}
+              loading={loading}
             />
           ) : activeTab === "json" ? (
             <JSONTab prettyJSON={prettyJSON} onCopy={onCopy} onJsonUpdate={onJsonUpdate} onJsonValidityChange={onJsonValidityChange} />
@@ -155,7 +156,7 @@ function QueryBuilder({ query, setQuery }) {
   );
 }
 
-function WorkflowsTab({ workflows, onSelectWorkflow, onDeleteWorkflow, query, setQuery }) {
+function WorkflowsTab({ workflows, onSelectWorkflow, onDeleteWorkflow, query, setQuery, loading }) {
   return (
     <div className="flex-1 flex flex-col p-3 gap-2 overflow-y-auto scrollable">
       <div className="flex justify-between items-center mb-2">
@@ -169,7 +170,15 @@ function WorkflowsTab({ workflows, onSelectWorkflow, onDeleteWorkflow, query, se
 
       <QueryBuilder query={query} setQuery={setQuery} />
       <div className="flex flex-col flex-1">
-        {workflows.length === 0 ? (
+        {loading ? (
+          <div className="flex-1 flex flex-col items-center justify-center gap-3 text-slate-500 py-10">
+            <svg className="w-8 h-8 animate-spin text-indigo-500/50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <div className="text-xs">Loading workflows...</div>
+          </div>
+        ) : workflows.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-3 text-slate-500 py-10">
             <div className="text-4xl opacity-50">📋</div>
             <div className="text-xs text-center leading-relaxed">

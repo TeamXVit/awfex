@@ -35,7 +35,8 @@ export default function Designer() {
         workflows,
         fetchWorkflows,
         saveWorkflow: saveWorkflowApi,
-        deleteWorkflow: deleteWorkflowApi
+        deleteWorkflow: deleteWorkflowApi,
+        loading: workflowsLoading,
     } = useWorkflows();
 
     const {
@@ -151,6 +152,7 @@ export default function Designer() {
                 setQuery={setQuery}
                 onSelectWorkflow={handleSelectWorkflow}
                 onDeleteWorkflow={handleDeleteWorkflow}
+                loading={workflowsLoading}
             />
 
             <div className="flex-1 flex flex-col overflow-hidden relative">

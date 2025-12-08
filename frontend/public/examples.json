@@ -1,23 +1,24 @@
 [
     {
         "title": "Natural Language Database Querying",
-        "description": "Turn plain English questions into executing database queries using a multi-step AI pipeline.",
+        "description": "Turn plain English questions into executing PostgreSQL queries using a multi-step AI pipeline.",
         "mechanics": [
             {
                 "step": "1. Gemini",
-                "description": "Translates your natural language request (e.g., 'get users over 25') into a raw SQL query string."
+                "description": "Converts your natural language request (e.g., 'get users over 25') into a PostgreSQL SQL query."
             },
             {
                 "step": "2. Regex",
-                "description": "Extracts *only* the SQL code from Gemini's markdown response to ensure clean execution."
+                "description": "Extracts only the SQL code from Gemini's markdown response to ensure the query is clean and executable."
             },
             {
-                "step": "3. SQLite",
-                "description": "Takes the cleaned SQL string and executes it against the database, returning the actual results."
+                "step": "3. PostgreSQL",
+                "description": "Executes the cleaned SQL query against your PostgreSQL database using the provided DATABASE_URL."
             }
         ],
         "jsonCode": {
-            "sqlite": [
+            "postgres": [
+                "$env:DATABASE_URL",
                 {
                     "regex": [
                         {
@@ -26,13 +27,13 @@
                                 "gemini-2.5-flash",
                                 {
                                     "add": [
-                                        "your a sqlite agent, you only output dqlite query.",
-                                        "gel all the users from users table whose age is above 25."
+                                        "you are a postgres agent, you only output PostgreSQL query.",
+                                        "get all the users from users table whose age is above 25."
                                     ]
                                 }
                             ]
                         },
-                        "```sqlite\\s*([\\s\\S]*?)```"
+                        "```sql\\s*([\\s\\S]*?)```"
                     ]
                 }
             ]
@@ -40,23 +41,23 @@
     },
     {
         "title": "Automated Data Analysis",
-        "description": "Fetch raw data from your database and have an AI agent perform insightful analysis on it automatically.",
+        "description": "Fetch raw data from your PostgreSQL database and let an AI agent automatically generate meaningful insights.",
         "mechanics": [
             {
-                "step": "1. SQLite",
-                "description": "Fetches raw rows from the database (e.g., all users)."
+                "step": "1. PostgreSQL",
+                "description": "Executes a SQL query (e.g., 'SELECT * FROM users') and retrieves raw rows from the database."
             },
             {
                 "step": "2. JSON Stringify",
-                "description": "Converts the database array result into a string format that the AI can read."
+                "description": "Converts the database result array into a string so the AI can easily understand the structure."
             },
             {
                 "step": "3. Add",
-                "description": "Combines the data string with an analysis prompt (e.g., 'Analyze this data...')."
+                "description": "Appends an analysis instruction prompt (e.g., 'Analyze this data...') to the stringified data."
             },
             {
                 "step": "4. Gemini",
-                "description": "Receives the combined context and outputs a text summary or insight about the data."
+                "description": "Processes the combined context and generates insights, summaries, or analysis about the dataset."
             }
         ],
         "jsonCode": {
@@ -68,13 +69,14 @@
                         {
                             "jsonStringify": [
                                 {
-                                    "sqlite": [
+                                    "postgres": [
+                                        "$env:DATABASE_URL",
                                         "SELECT * FROM users;\n"
                                     ]
                                 }
                             ]
                         },
-                        "your a data analysis agent, analysis the provided data."
+                        "you are a data analysis agent, analyze the provided data."
                     ]
                 }
             ]
