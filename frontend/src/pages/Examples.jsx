@@ -41,8 +41,9 @@ export default function Examples() {
           </h3>
           <ol className="space-y-3 text-slate-400 text-sm md:text-base list-decimal list-inside marker:text-indigo-500">
             <li><strong>Copy</strong> the JSON code block from an example below.</li>
-            <li>Go to the <Link to="/designer" className="text-indigo-400 hover:underline">Designer</Link> page.</li>
-            <li>Click the <strong>JSON</strong> tab in the sidebar.</li>
+            <li className="hidden md:list-item">Go to the <Link to="/designer" className="text-indigo-400 hover:underline">Designer</Link> page.</li>
+            <li className="md:hidden"><strong>Open the Designer</strong> on a desktop device.</li>
+            <li><strong>Click</strong> the <strong>JSON</strong> tab in the sidebar.</li>
             <li><strong>Paste</strong> the code and click <strong>Save</strong>.</li>
             <li>The workflow will visualize automatically on the canvas!</li>
           </ol>
