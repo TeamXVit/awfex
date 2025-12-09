@@ -216,14 +216,14 @@ export default function Docs() {
                         </p>
                     </div>
 
-                    {/* Auth + Rate Limits */}
+                    {/* Auth */}
                     <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
                         <h3 className="text-lg font-bold text-white mb-2">
-                            Authentication & Rate Limits
+                            Authentication
                         </h3>
 
                         <p className="text-sm text-slate-400 mb-3">
-                            AWFEX uses API Key authentication. Include it in:
+                            AWFEX uses API Key authentication. Include it in the header:
                         </p>
 
                         <pre className="text-xs font-mono bg-slate-950 p-3 rounded border border-slate-800 text-blue-400 overflow-x-auto">
