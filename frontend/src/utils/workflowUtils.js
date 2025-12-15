@@ -59,7 +59,6 @@ export const rebuildFromWorkflow = (workflow, deleteNode, handleInputValueChange
     const build = (data, depth = 0, xOffset = 0) => {
         let nodeId;
 
-        // INPUT NODE
         if (typeof data !== "object" || data === null || Array.isArray(data)) {
             nodeId = genNodeId("input");
 
@@ -77,7 +76,6 @@ export const rebuildFromWorkflow = (workflow, deleteNode, handleInputValueChange
             return { nodeId, width: 1 };
         }
 
-        // FUNCTION NODE
         const fnName = Object.keys(data)[0];
         const args = data[fnName];
 
@@ -96,7 +94,6 @@ export const rebuildFromWorkflow = (workflow, deleteNode, handleInputValueChange
             },
         });
 
-        // Child positions
         let childYOffset = xOffset - totalWidth / 2;
 
         args.forEach((arg) => {

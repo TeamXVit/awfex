@@ -76,7 +76,6 @@ export function useFlow(descriptions = {}) {
             descriptions
         );
 
-        // Apply auto-layout to the loaded nodes
         const layoutedNodes = getLayoutedNodes(newNodes, newEdges, 'TB');
 
         setNodes(layoutedNodes);

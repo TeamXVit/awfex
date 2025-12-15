@@ -14,7 +14,6 @@ export const getLayoutedNodes = (nodes, edges, direction = 'TB') => {
     const dagreGraph = new dagre.graphlib.Graph();
     dagreGraph.setDefaultEdgeLabel(() => ({}));
 
-    // Configure the graph layout
     dagreGraph.setGraph({
         rankdir: direction,
         nodesep: 100,  // Horizontal spacing between nodes
@@ -24,20 +23,16 @@ export const getLayoutedNodes = (nodes, edges, direction = 'TB') => {
         marginy: 50,
     });
 
-    // Add nodes to the graph
     nodes.forEach((node) => {
         dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
     });
 
-    // Add edges to the graph
     edges.forEach((edge) => {
         dagreGraph.setEdge(edge.source, edge.target);
     });
 
-    // Calculate the layout
     dagre.layout(dagreGraph);
 
-    // Apply the calculated positions to nodes
     const layoutedNodes = nodes.map((node) => {
         const nodeWithPosition = dagreGraph.node(node.id);
 

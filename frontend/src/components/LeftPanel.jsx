@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MdDelete, MdChevronLeft, MdChevronRight, MdSettings, MdContentPaste, MdInfo, MdHome } from "react-icons/md";
+import { MdDelete, MdChevronLeft, MdChevronRight, MdSettings, MdContentPaste, MdHome } from "react-icons/md";
 import { LuWorkflow } from "react-icons/lu";
 import { RiFunctionAddLine } from "react-icons/ri";
 
@@ -25,7 +25,6 @@ export default function LeftPanel({
 }) {
   const [activeTab, setActiveTab] = useState("workflows");
   const [showJsonModal, setShowJsonModal] = useState(false);
-  const [showInfoModal, setShowInfoModal] = useState(false);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -40,7 +39,7 @@ export default function LeftPanel({
         <div className="w-16 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-4 gap-2">
           <a
             href="/"
-            className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded-lg transition-all mb-4"
+            className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded-md transition-all mb-4"
             title="Go to Home"
           >
             <MdHome size={24} />
@@ -48,52 +47,37 @@ export default function LeftPanel({
 
           <button
             onClick={() => handleTabClick("workflows")}
-            className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded-lg transition-all"
+            className={`w-12 h-12 flex items-center justify-center rounded-md transition-all ${activeTab === "workflows"
+              ? "bg-indigo-600 text-white"
+              : "text-slate-400 hover:text-indigo-400 hover:bg-slate-800"
+              }`}
             title="Workflows"
           >
             <LuWorkflow size={24} />
           </button>
           <button
             onClick={() => handleTabClick("functions")}
-            className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded-lg transition-all"
+            className={`w-12 h-12 flex items-center justify-center rounded-md transition-all ${activeTab === "functions"
+              ? "bg-indigo-600 text-white"
+              : "text-slate-400 hover:text-indigo-400 hover:bg-slate-800"
+              }`}
             title="Functions"
           >
             <RiFunctionAddLine size={24} />
-          </button>
-          <button
-            onClick={() => handleTabClick("settings")}
-            className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded-lg transition-all"
-            title="Settings"
-          >
-            <MdSettings size={24} />
           </button>
 
           <div className="flex-1" />
 
           <button
-            onClick={() => setShowInfoModal(!showInfoModal)}
-            className="w-12 h-12 flex items-center justify-center text-slate-400 hover:text-blue-400 hover:bg-slate-800 rounded-lg transition-all relative"
-            title="Tips"
+            onClick={() => handleTabClick("settings")}
+            className={`w-12 h-12 flex items-center justify-center rounded-md transition-all ${activeTab === "settings"
+              ? "bg-indigo-600 text-white"
+              : "text-slate-400 hover:text-indigo-400 hover:bg-slate-800"
+              }`}
+            title="Settings"
           >
-            <MdInfo size={24} />
+            <MdSettings size={24} />
           </button>
-
-          {showInfoModal && (
-            <div className="absolute left-16 bottom-4 bg-slate-800 border border-slate-700 rounded-lg p-3 shadow-xl z-50 w-64 ml-2">
-              <div className="flex justify-between items-start mb-2">
-                <h4 className="text-xs font-bold text-slate-200">Tip</h4>
-                <button
-                  onClick={() => setShowInfoModal(false)}
-                  className="text-slate-400 hover:text-slate-200 text-lg leading-none"
-                >
-                  ×
-                </button>
-              </div>
-              <div className="text-[11px] text-slate-300">
-                Give inputs to the functions in the mentioned parameters order.
-              </div>
-            </div>
-          )}
         </div>
       )}
 
@@ -197,7 +181,7 @@ function FunctionsTab({ functions, onAddFunc, onAddInput }) {
 
       <button
         onClick={onAddInput}
-        className="w-full py-2.5 px-4 rounded-lg border border-blue-500/50 bg-blue-600 text-white text-sm font-semibold cursor-pointer transition-all hover:bg-blue-500 hover:border-blue-400 shadow-lg shadow-blue-500/20"
+        className="w-full py-2.5 px-4 rounded-md border border-blue-500/50 bg-blue-600 text-white text-sm font-semibold cursor-pointer transition-all hover:bg-blue-500 hover:border-blue-400 shadow-lg shadow-blue-500/20"
       >
         Add Input Node
       </button>
@@ -218,7 +202,7 @@ function FunctionsTab({ functions, onAddFunc, onAddInput }) {
             placeholder="Search functions..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full py-2 px-3 pl-9 bg-slate-800 text-slate-200 border border-slate-700 rounded-lg text-xs outline-none focus:border-indigo-500 focus:bg-slate-900 transition-colors"
+            className="w-full py-2 px-3 pl-9 bg-slate-800 text-slate-200 border border-slate-700 rounded-md text-xs outline-none focus:border-indigo-500 focus:bg-slate-900 transition-colors"
           />
           <svg
             className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"
@@ -235,13 +219,13 @@ function FunctionsTab({ functions, onAddFunc, onAddInput }) {
           </svg>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="flex flex-col gap-2">
           {filteredFunctions.length > 0 ? (
             filteredFunctions.map((func) => (
               <button
                 key={func}
                 onClick={() => onAddFunc(func)}
-                className="group relative py-3 px-3 rounded-lg border-2 border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 text-slate-200 text-xs font-semibold cursor-pointer transition-all hover:border-indigo-500 hover:from-indigo-600 hover:to-indigo-700 hover:text-white hover:shadow-xl hover:shadow-indigo-500/30 hover:scale-105 text-left capitalize active:scale-95"
+                className="group relative w-full py-3 px-3 rounded-md border-2 border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 text-slate-200 text-xs font-semibold cursor-pointer transition-all hover:border-indigo-500 hover:from-indigo-600 hover:to-indigo-700 hover:text-white hover:shadow-xl hover:shadow-indigo-500/30 hover:scale-105 text-left capitalize active:scale-95"
                 title={`Add ${func} node`}
               >
                 <div className="flex items-center gap-2">
@@ -253,15 +237,11 @@ function FunctionsTab({ functions, onAddFunc, onAddInput }) {
               </button>
             ))
           ) : (
-            <div className="col-span-2 text-center py-6 text-slate-500 text-xs">
+            <div className="text-center py-6 text-slate-500 text-xs">
               No functions found
             </div>
           )}
         </div>
-      </div>
-
-      <div className="text-[11px] text-slate-400 bg-slate-800 p-2.5 rounded-md border border-slate-700 mt-auto">
-        <strong>Tip:</strong> Click on any function to add it to the canvas.
       </div>
     </div>
   );
@@ -312,7 +292,7 @@ function QueryBuilder({ query, setQuery }) {
   };
 
   return (
-    <div className="mt-4 p-4 bg-slate-900/50 rounded-lg border border-slate-800 flex flex-col gap-3">
+    <div className="mt-4 p-4 bg-slate-900/50 rounded-md border border-slate-800 flex flex-col gap-3">
       <div className="text-sm font-bold text-slate-300 mb-1">
         Query Parameters
       </div>
@@ -369,7 +349,7 @@ function WorkflowsTab({ workflows, onSelectWorkflow, onDeleteWorkflow, query, se
 
       <button
         onClick={onOpenJsonModal}
-        className="py-2.5 px-4 rounded-lg border border-purple-500/50 bg-purple-600 text-white text-sm font-semibold cursor-pointer transition-all hover:bg-purple-500 hover:border-purple-400 shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2"
+        className="py-2.5 px-4 rounded-md border border-purple-500/50 bg-purple-600 text-white text-sm font-semibold cursor-pointer transition-all hover:bg-purple-500 hover:border-purple-400 shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2"
       >
         <MdContentPaste size={18} />
         {hasNodes ? "View JSON" : "Paste JSON"}
@@ -431,9 +411,6 @@ function WorkflowsTab({ workflows, onSelectWorkflow, onDeleteWorkflow, query, se
             ))}
           </div>
         )}
-        <div className="text-[11px] text-slate-400 bg-slate-800 p-2.5 rounded-md border border-slate-700 mt-2 flex-shrink-0">
-          <strong>Tip:</strong> Give inputs to the functions in the mentioned parameters order.
-        </div>
       </div>
     </div>
   );

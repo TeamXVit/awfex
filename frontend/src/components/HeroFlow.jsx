@@ -8,7 +8,6 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-// Custom Node Component
 const CustomNode = ({ data, isConnectable }) => {
     return (
         <div className={`relative min-w-[150px] bg-slate-900/90 backdrop-blur-xl border-2 rounded-xl p-4 shadow-2xl transition-all hover:scale-105 hover:shadow-indigo-500/20 ${data.borderColor}`}>

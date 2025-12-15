@@ -22,13 +22,11 @@ export default function Designer() {
     const [selectedFunc, setSelectedFunc] = useState("");
     const [query, setQuery] = useState("");
 
-    // Result Modal State
     const [showResultModal, setShowResultModal] = useState(false);
     const [runResult, setRunResult] = useState(null);
     const [runError, setRunError] = useState(null);
     const [isRunning, setIsRunning] = useState(false);
 
-    // Toast State
     const [toast, setToast] = useState(null);
 
     const {
@@ -118,7 +116,6 @@ export default function Designer() {
             const data = await api.fetchWorkflowDetails(workflow.name);
             if (!data.success) throw new Error(data.error || "Failed to load workflow");
             loadWorkflow(data.workflow);
-            // No success message - silently load the workflow
         } catch (error) {
             setToast({ message: `Error loading workflow: ${error.message}`, type: "error" });
         }
@@ -134,7 +131,6 @@ export default function Designer() {
     };
 
     const handleJsonUpdate = (newJson) => {
-        // Allow passing object directly or string
         const parsed = typeof newJson === "string" ? JSON.parse(newJson) : newJson;
         loadWorkflow(parsed);
     };
@@ -179,6 +175,8 @@ export default function Designer() {
                     onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
                     isRunning={isRunning}
+                    onAutoLayout={applyAutoLayout}
+                    onClearWorkflow={clearWorkflow}
                 />
             </div>
 
