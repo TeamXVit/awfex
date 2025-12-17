@@ -16,7 +16,7 @@ import { regex, regexDescription } from "./functions/regex.js";
 import { redis, redisDescription } from "./functions/redis.js";
 import { code, codeDescription } from "./functions/code.js";
 import { array, arrayDescription } from "./functions/array.js";
-import { jsonExpression, jsonExpressionDescription } from "./functions/jsonExpression,js";
+import { jsonExpression, jsonExpressionDescription } from "./functions/jsonExpression.js";
 
 export const FUNCTIONS = {
   add,
