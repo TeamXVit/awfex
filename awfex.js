@@ -14,21 +14,27 @@ import { httpRequest, httpRequestDescription } from "./functions/httpRequest.js"
 import { postgres, postgresDescription } from "./functions/postgres.js";
 import { regex, regexDescription } from "./functions/regex.js";
 import { redis, redisDescription } from "./functions/redis.js";
+import { code, codeDescription } from "./functions/code.js";
+import { array, arrayDescription } from "./functions/array.js";
+import { jsonExpression, jsonExpressionDescription } from "./functions/jsonExpression,js";
 
 export const FUNCTIONS = {
-  add: add,
-  sub: sub,
-  mul: mul,
-  div: div,
-  print: print,
-  gemini: gemini,
-  wait: wait,
-  jsonParse: jsonParse,
-  jsonStringify: jsonStringify,
-  httpRequest: httpRequest,
-  postgres: postgres,
-  regex: regex,
-  redis: redis
+  add,
+  sub,
+  mul,
+  div,
+  print,
+  gemini,
+  wait,
+  jsonParse,
+  jsonStringify,
+  httpRequest,
+  postgres,
+  regex,
+  redis,
+  code,
+  array,
+  jsonExpression,
 };
 
 export const DESCRIPTIONS = {
@@ -44,7 +50,10 @@ export const DESCRIPTIONS = {
   httpRequest: httpRequestDescription,
   postgres: postgresDescription,
   regex: regexDescription,
-  redis: redisDescription
+  redis: redisDescription,
+  code: codeDescription,
+  array: arrayDescription,
+  jsonExpression: jsonExpressionDescription,
 };
 
 function convertIfNumeric(str) {
