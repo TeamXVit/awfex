@@ -110,14 +110,6 @@ export default function FunctionNode({ id, data }) {
     <>
       <div className="relative group">
         <div
-          className="absolute top-full left-1/2 -translate-x-1/2 translate-y-3 bg-slate-900/95 backdrop-blur-sm text-slate-100 px-4 py-3 rounded text-xs font-medium whitespace-pre-wrap pointer-events-auto opacity-0 transition-all duration-300 z-50 leading-relaxed w-max max-w-[250px] max-h-[150px] overflow-y-auto shadow-2xl border border-blue-500/30 group-hover:opacity-100 group-hover:translate-y-2 hover:opacity-100 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-indigo-500/80 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-indigo-400"
-          onWheel={(e) => e.stopPropagation()}
-        >
-          <div className="text-blue-400 font-semibold mb-1 text-[10px] uppercase tracking-wide">Description</div>
-          <div className="text-slate-200">{data.tooltip ?? "No Description Available"}</div>
-        </div>
-
-        <div
           role="group"
           aria-label={`function-node-${id}`}
           onDoubleClick={handleOpenPanel}
@@ -136,8 +128,8 @@ export default function FunctionNode({ id, data }) {
 
           <Handle
             type="target"
-            position={Position.Top}
-            style={{ top: '-8px', left: '50%', transform: 'translateX(-50%)' }}
+            position={Position.Left}
+            style={{ left: '-8px', top: '50%', transform: 'translateY(-50%)' }}
             className="!bg-indigo-500 !border-[3px] !border-slate-800 !w-4 !h-4 !shadow-lg !shadow-indigo-500/50"
           />
 
@@ -175,8 +167,8 @@ export default function FunctionNode({ id, data }) {
 
           <Handle
             type="source"
-            position={Position.Bottom}
-            style={{ bottom: '-8px', left: '50%', transform: 'translateX(-50%)' }}
+            position={Position.Right}
+            style={{ right: '-8px', top: '50%', transform: 'translateY(-50%)' }}
             className="!bg-indigo-500 !border-[3px] !border-slate-800 !w-4 !h-4 !shadow-lg !shadow-indigo-500/50"
           />
         </div>
@@ -192,6 +184,7 @@ export default function FunctionNode({ id, data }) {
           functionMetadata={data.metadata || {}}
           availableInputs={availableInputs}
           currentMappings={data.parameterMappings || []}
+          description={data.tooltip}
         />
       )}
     </>

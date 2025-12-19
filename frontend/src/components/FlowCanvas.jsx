@@ -1,4 +1,4 @@
-import ReactFlow, { Background } from "reactflow";
+import ReactFlow, { Background, MiniMap, Controls } from "reactflow";
 import "reactflow/dist/style.css";
 
 export default function FlowCanvas({
@@ -35,13 +35,30 @@ export default function FlowCanvas({
           padding: 0.2,
           maxZoom: 0.8,
         }}
+        minZoom={0.1}
       >
         <Background />
+        <MiniMap
+          nodeStrokeColor="#6366f1"
+          maskColor="#0f172a"
+          style={{
+            backgroundColor: '#1e293b',
+            height: 100,
+            width: 150,
+            borderRadius: 8,
+            border: '1px solid #334155'
+          }}
+          nodeColor={(node) => {
+            return '#334155';
+          }}
+          position="bottom-left"
+        />
+        <Controls position="bottom-left" className="!border-slate-700 !text-slate-300 [&>button]:!border-slate-700 [&>button:hover]:!bg-slate-700 !w-fit !h-fit !p-1 !rounded-md !shadow-lg" />
       </ReactFlow>
 
       <div className="absolute bottom-3 right-3 flex gap-2 z-10">
         <button
-          onClick={() => onAutoLayout('TB')}
+          onClick={() => onAutoLayout('LR')}
           className="w-10 h-10 flex items-center justify-center rounded-md bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:border-slate-600 hover:text-white transition-all shadow-lg"
           title="Auto Layout"
         >

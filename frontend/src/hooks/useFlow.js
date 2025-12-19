@@ -155,13 +155,13 @@ export function useFlow(functionMetadata = {}) {
             functionMetadata
         );
 
-        const layoutedNodes = getLayoutedNodes(newNodes, newEdges, 'TB');
+        const layoutedNodes = getLayoutedNodes(newNodes, newEdges, 'LR');
 
         setNodes(layoutedNodes);
         setEdges(newEdges);
     };
 
-    const applyAutoLayout = (direction = 'TB') => {
+    const applyAutoLayout = (direction = 'LR') => {
         const layoutedNodes = getLayoutedNodes(nodes, edges, direction);
         setNodes(layoutedNodes);
     };

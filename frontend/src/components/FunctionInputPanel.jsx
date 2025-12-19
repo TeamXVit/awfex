@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { MdAdd, MdDelete, MdClose, MdLink } from "react-icons/md";
+import { MdAdd, MdDelete, MdClose, MdLink, MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 
 export default function FunctionInputPanel({
     isOpen,
@@ -11,17 +11,20 @@ export default function FunctionInputPanel({
     functionMetadata = {},
     availableInputs = [], // Array of {id, name, type} for connected nodes
     currentMappings = [], // Current parameter mappings
+    description = ""
 }) {
     const [currentNodeName, setCurrentNodeName] = useState(nodeName);
     const [parameterMappings, setParameterMappings] = useState([]);
+    const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
 
     // Initialize parameter mappings
     useEffect(() => {
         if (isOpen) {
             setCurrentNodeName(nodeName || functionName);
 
-            const paramNames = functionMetadata.parameters || ['A', 'B'];
+            const paramNames = functionMetadata.parameters || [];
             const hasVariableParams = functionMetadata.hasVariableParams;
+            const variableParamName = functionMetadata.variableParamName || "Argument";
 
             // Start with a copy of current mappings
             let newMappings = [];
@@ -34,7 +37,13 @@ export default function FunctionInputPanel({
 
                 for (let i = 0; i < count; i++) {
                     const existing = currentMappings[i];
-                    const defaultName = paramNames[i] || `Argument ${i + 1}`;
+                    let defaultName = paramNames[i];
+
+                    if (!defaultName) {
+                        // Generate name for variable arguments
+                        // If we have fixed params, continue the index, otherwise use regular indexing
+                        defaultName = `${variableParamName} ${i + 1}`;
+                    }
 
                     if (existing) {
                         newMappings.push({ ...existing, paramName: existing.paramName || defaultName });
@@ -50,25 +59,40 @@ export default function FunctionInputPanel({
                 }
             } else {
                 // No existing mappings, initialize from defaults
-                newMappings = paramNames.map((paramName, index) => {
+                // If paramNames is empty but hasVariableParams is true, maybe start with 2?
+                // The original code assumed paramNames had something. 
+                // If paramNames is empty, we should probably add at least 2 for variable params functions usually (like add)
+                // But let's respect paramNames length if > 0. 
+
+                let initialCount = paramNames.length;
+                if (initialCount === 0 && hasVariableParams) {
+                    initialCount = 2; // Default to 2 inputs for vararg functions with no explicit params
+                }
+
+                for (let i = 0; i < initialCount; i++) {
+                    let paramName = paramNames[i];
+                    if (!paramName) {
+                        paramName = `${variableParamName} ${i + 1}`;
+                    }
+
                     // Auto-map first available input to first parameter
-                    if (index === 0 && availableInputs.length > 0) {
-                        return {
+                    if (i === 0 && availableInputs.length > 0) {
+                        newMappings.push({
                             paramName,
                             sourceType: 'node',
                             sourceNodeId: availableInputs[0].id,
                             manualValue: '',
-                        };
+                        });
+                    } else {
+                        // Default to manual input
+                        newMappings.push({
+                            paramName,
+                            sourceType: 'manual',
+                            sourceNodeId: null,
+                            manualValue: '',
+                        });
                     }
-
-                    // Default to manual input
-                    return {
-                        paramName,
-                        sourceType: 'manual',
-                        sourceNodeId: null,
-                        manualValue: '',
-                    };
-                });
+                }
             }
 
             setParameterMappings(newMappings);
@@ -94,8 +118,17 @@ export default function FunctionInputPanel({
 
     const handleAddArgument = () => {
         const newIndex = parameterMappings.length;
+        const i = newIndex;
+        const paramNames = functionMetadata.parameters || [];
+        const variableParamName = functionMetadata.variableParamName || "Argument";
+
+        let paramName = paramNames[i];
+        if (!paramName) {
+            paramName = `${variableParamName} ${i + 1}`;
+        }
+
         setParameterMappings([...parameterMappings, {
-            paramName: `Argument ${newIndex + 1}`,
+            paramName: paramName,
             sourceType: 'manual',
             sourceNodeId: null,
             manualValue: '',
@@ -118,23 +151,41 @@ export default function FunctionInputPanel({
                 }`}
         >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-700 bg-slate-800">
-                <div className="flex-1">
-                    <input
-                        type="text"
-                        value={currentNodeName}
-                        onChange={(e) => setCurrentNodeName(e.target.value)}
-                        className="w-full bg-transparent text-lg font-bold text-slate-100 outline-none border-none"
-                        placeholder="Node name"
-                    />
-                    <div className="text-xs text-slate-400 mt-0.5">{functionName}</div>
+            <div className="flex flex-col p-4 border-b border-slate-700 bg-slate-800 gap-2">
+                <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                        <input
+                            type="text"
+                            value={currentNodeName}
+                            onChange={(e) => setCurrentNodeName(e.target.value)}
+                            className="w-full bg-transparent text-lg font-bold text-slate-100 outline-none border-none"
+                            placeholder="Node name"
+                        />
+                        <div className="text-xs text-slate-400 mt-0.5">{functionName}</div>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="text-slate-400 hover:text-slate-200 transition-colors p-1"
+                    >
+                        <MdClose size={24} />
+                    </button>
                 </div>
-                <button
-                    onClick={onClose}
-                    className="text-slate-400 hover:text-slate-200 transition-colors p-1"
-                >
-                    <MdClose size={24} />
-                </button>
+                {description && (
+                    <div className="flex flex-col gap-1">
+                        <button
+                            onClick={() => setIsDescriptionOpen(!isDescriptionOpen)}
+                            className="flex items-center gap-1 text-xs font-semibold text-slate-400 hover:text-slate-300 transition-colors self-start"
+                        >
+                            <span>Description</span>
+                            {isDescriptionOpen ? <MdKeyboardArrowUp size={14} /> : <MdKeyboardArrowDown size={14} />}
+                        </button>
+                        {isDescriptionOpen && (
+                            <div className="whitespace-pre-line text-xs text-slate-300 bg-slate-700/50 p-2 rounded border border-slate-600/50 leading-relaxed transition-all">
+                                {description}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Content */}
@@ -192,12 +243,11 @@ export default function FunctionInputPanel({
 
                                 {/* Value Input */}
                                 {mapping.sourceType === 'manual' ? (
-                                    <input
-                                        type="text"
+                                    <textarea
                                         value={mapping.manualValue}
                                         onChange={(e) => handleManualValueChange(index, e.target.value)}
                                         placeholder={`Value for ${mapping.paramName}`}
-                                        className="w-full bg-slate-950 rounded-md p-2 text-slate-100 border border-slate-700 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm"
+                                        className="w-full bg-slate-950 rounded-md p-2 text-slate-100 border border-slate-700 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm min-h-[80px] resize-y"
                                     />
                                 ) : (
                                     <div className="flex items-center gap-2 p-2 bg-indigo-500/10 border border-indigo-500/30 rounded-md">

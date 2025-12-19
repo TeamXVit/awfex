@@ -12,7 +12,8 @@ Returns:
 `;
 
 export const arrayMetadata = {
-  parameters: ["Values"],
+  parameters: [],
+  variableParamName: "Item",
   icon: "/icons/array.png",
   hasVariableParams: true
 };

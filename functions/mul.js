@@ -13,7 +13,8 @@ Returns:
 `;
 
 export const mulMetadata = {
-  parameters: ["A", "B"],
+  parameters: [], // Variable number of arguments
+  variableParamName: "Value",
   icon: "/icons/mul.png",
   hasVariableParams: true
 };

@@ -221,13 +221,6 @@ function FunctionsTab({ functions, onAddFunc, onAddInput }) {
         </div>
       </div>
 
-      <button
-        onClick={onAddInput}
-        className="w-full py-2.5 px-4 rounded-md border border-blue-500/50 bg-blue-600 text-white text-sm font-semibold cursor-pointer transition-all hover:bg-blue-500 hover:border-blue-400 shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
-      >
-        <MdInput size={18} />
-        Add Input Node
-      </button>
 
       <div className="border-t border-slate-800 pt-3">
         <div className="flex justify-between items-center mb-3">

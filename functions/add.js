@@ -19,7 +19,8 @@ Returns:
 `;
 
 export const addMetadata = {
-  parameters: ["A", "B"],
+  parameters: [], // Variable number of arguments
+  variableParamName: "Value",
   icon: "/icons/add.png",
   hasVariableParams: true
 };

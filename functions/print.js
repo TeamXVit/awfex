@@ -12,7 +12,8 @@ Returns:
 `;
 
 export const printMetadata = {
-  parameters: ["Value"],
+  parameters: [],
+  variableParamName: "Value",
   icon: "/icons/print.png",
   hasVariableParams: true
 };

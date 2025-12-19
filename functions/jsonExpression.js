@@ -39,6 +39,7 @@ Examples:
 
 export const jsonExpressionMetadata = {
   parameters: ["Expression", "JSON Inputs"],
+  variableParamName: "JSON Input",
   icon: "/icons/jsonExpression.png",
   hasVariableParams: true
 };

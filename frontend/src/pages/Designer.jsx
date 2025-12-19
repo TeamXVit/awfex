@@ -3,7 +3,7 @@ import FlowCanvas from "../components/FlowCanvas";
 import LeftPanel from "../components/LeftPanel";
 import Toolbar from "../components/Toolbar";
 import FunctionNode from "../nodes/FunctionNode";
-import InputNode from "../nodes/InputNode";
+
 import ResultModal from "../components/ResultModal";
 import Toast from "../components/Toast";
 import { useWorkflows } from "../hooks/useWorkflows";
@@ -13,7 +13,6 @@ import { buildWorkflowJSON } from "../utils/workflowUtils";
 
 const nodeTypes = {
     custom: FunctionNode,
-    inputNode: InputNode,
 };
 
 export default function Designer() {
